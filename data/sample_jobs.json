@@ -1,0 +1,16 @@
+[
+  {
+    "company": "Confido",
+    "role": "New Grad Software Engineer",
+    "location": "New York, NY",
+    "source": "YC Work at a Startup",
+    "jobDescription": "Confido is building AI-enabled financial automation and intelligence for CPG brands. The role involves full-stack product engineering, backend systems, APIs, data workflows, and applied AI automation. We are looking for a new grad who can learn quickly, build practical software, work with customer workflows, and support AI-driven business automation. Experience with Python, SQL, APIs, databases, debugging, and product engineering is helpful."
+  },
+  {
+    "company": "Calltree",
+    "role": "AI Operations Analyst",
+    "location": "San Francisco, CA",
+    "source": "YC Work at a Startup",
+    "jobDescription": "The AI Operations Analyst monitors AI agents, reviews quality, rescues difficult customer conversations, identifies edge cases, and works with engineering to improve agent behavior. Strong communication, data review, troubleshooting, and human-in-the-loop judgment are important."
+  }
+]

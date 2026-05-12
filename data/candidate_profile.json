@@ -1,0 +1,29 @@
+{
+  "name": "Zhuo Chen",
+  "headline": "Computer Engineering / Computer Science graduate with software, data validation, and AI workflow automation experience",
+  "skills": [
+    "Python",
+    "SQL",
+    "Flask",
+    "MySQL",
+    "Docker",
+    "Git",
+    "Postman",
+    "REST APIs",
+    "data validation",
+    "debugging",
+    "database maintenance",
+    "Pandas",
+    "NumPy",
+    "AI Agents",
+    "workflow automation",
+    "prompt design"
+  ],
+  "experience": [
+    "Software development and database maintenance at Xiyin (Shein)",
+    "Data validation, debugging, troubleshooting, and system reliability work",
+    "REST API project using Flask, MySQL, Postman, and Docker",
+    "Search/text processing project using TF-IDF and cosine similarity",
+    "AI job application workflow for JD parsing, tailoring, and tracker management"
+  ]
+}

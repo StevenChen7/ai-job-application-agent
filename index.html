@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Job Application Agent</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="input-panel">
+      <header>
+        <p class="eyebrow">AI workflow automation</p>
+        <h1>AI Job Application Agent</h1>
+      </header>
+
+      <div class="field-grid">
+        <label>
+          Company
+          <input id="company" autocomplete="organization" placeholder="VectorShift">
+        </label>
+        <label>
+          Role
+          <input id="role" autocomplete="organization-title" placeholder="AI Engineer">
+        </label>
+        <label>
+          Location
+          <input id="location" autocomplete="address-level2" placeholder="New York, NY">
+        </label>
+        <label>
+          Source
+          <input id="source" placeholder="YC Work at a Startup">
+        </label>
+      </div>
+
+      <label>
+        Job Description
+        <textarea id="jobDescription" placeholder="Paste a job description here"></textarea>
+      </label>
+
+      <div class="actions">
+        <button id="sampleButton" type="button">Load Sample</button>
+        <button id="analyzeButton" type="button" class="primary">Analyze</button>
+        <button id="clearButton" type="button">Clear</button>
+      </div>
+    </section>
+
+    <section class="results-panel" aria-live="polite">
+      <div class="score-strip">
+        <div>
+          <span class="label">Fit Score</span>
+          <strong id="fitScore">--</strong>
+        </div>
+        <div>
+          <span class="label">Role Type</span>
+          <strong id="roleType">--</strong>
+        </div>
+        <div>
+          <span class="label">OPT Risk</span>
+          <strong id="riskLevel">--</strong>
+        </div>
+      </div>
+
+      <div class="output-grid">
+        <section>
+          <div class="section-title">
+            <h2>Requirement Summary</h2>
+            <button class="copy-button" data-copy="summaryOutput">Copy</button>
+          </div>
+          <pre id="summaryOutput"></pre>
+        </section>
+
+        <section>
+          <div class="section-title">
+            <h2>Tailored Bullets</h2>
+            <button class="copy-button" data-copy="bulletsOutput">Copy</button>
+          </div>
+          <pre id="bulletsOutput"></pre>
+        </section>
+
+        <section>
+          <div class="section-title">
+            <h2>Outreach Message</h2>
+            <button class="copy-button" data-copy="messageOutput">Copy</button>
+          </div>
+          <pre id="messageOutput"></pre>
+        </section>
+
+        <section>
+          <div class="section-title">
+            <h2>Tracker Row</h2>
+            <button class="copy-button" data-copy="trackerOutput">Copy</button>
+          </div>
+          <pre id="trackerOutput"></pre>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "ai-job-application-agent",
+  "version": "1.0.0",
+  "description": "A browser-based AI workflow automation project for job description analysis, resume tailoring, outreach drafting, and application tracking.",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/run-tests.mjs"
+  },
+  "keywords": [
+    "ai-agent",
+    "workflow-automation",
+    "job-search",
+    "llm",
+    "stem-opt",
+    "application-tracker"
+  ],
+  "author": "Zhuo Chen",
+  "license": "MIT"
+}
