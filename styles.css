@@ -21,6 +21,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
 }
 
 .app-shell {
@@ -48,20 +49,20 @@ body {
 .eyebrow {
   margin: 0 0 4px;
   color: var(--accent);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
 }
 
 h1 {
   margin: 0 0 16px;
-  font-size: 28px;
+  font-size: 34px;
   line-height: 1.1;
 }
 
 h2 {
   margin: 0;
-  font-size: 15px;
+  font-size: 18px;
 }
 
 label {
@@ -69,7 +70,7 @@ label {
   gap: 6px;
   margin-bottom: 12px;
   color: #26343c;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -151,13 +152,13 @@ button:hover {
 .label {
   display: block;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   margin-bottom: 6px;
 }
 
 .score-strip strong {
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .output-grid {
@@ -182,7 +183,7 @@ button:hover {
 .copy-button {
   min-height: 30px;
   padding: 0 10px;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 pre {
@@ -192,7 +193,7 @@ pre {
   overflow-wrap: anywhere;
   color: #23313a;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.45;
   padding: 12px;
 }
