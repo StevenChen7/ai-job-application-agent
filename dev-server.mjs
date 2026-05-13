@@ -7,6 +7,7 @@ import { generateApplicationContent } from "./src/agent-core.mjs";
 const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT || 4173);
 const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
+let latestImportedPage = null;
 
 const types = {
   ".html": "text/html; charset=utf-8",
@@ -19,9 +20,38 @@ const types = {
 
 const server = http.createServer(async (req, res) => {
   try {
+    setCorsHeaders(res);
+    if (req.method === "OPTIONS") {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
+
     if (req.method === "POST" && req.url === "/api/analyze") {
       const body = await readJson(req);
       const result = await analyzeWithOpenAI(body);
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify(result));
+      return;
+    }
+
+    if (req.method === "POST" && req.url === "/api/import-page") {
+      const body = await readJson(req);
+      const result = importRenderedPage(body);
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify(result));
+      return;
+    }
+
+    if (req.method === "GET" && req.url === "/api/imported-page") {
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify(latestImportedPage || { ok: false, error: "No imported page yet." }));
+      return;
+    }
+
+    if (req.method === "POST" && req.url === "/api/fetch-job") {
+      const body = await readJson(req);
+      const result = await fetchJobFromUrl(body.url);
       res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
       res.end(JSON.stringify(result));
       return;
@@ -53,6 +83,147 @@ async function readJson(req) {
   let raw = "";
   for await (const chunk of req) raw += chunk;
   return raw ? JSON.parse(raw) : {};
+}
+
+function setCorsHeaders(res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+}
+
+function importRenderedPage(payload = {}) {
+  const url = payload.url || "";
+  const title = payload.title || "";
+  const text = String(payload.selectedText || payload.text || "").trim();
+  if (!text || text.length < 80) {
+    return { ok: false, error: "Current page text is too short. Select the job description text and try again." };
+  }
+
+  const parsed = parseJobMetadata(title, text, url || "https://current-tab.local");
+  latestImportedPage = {
+    ok: true,
+    importedAt: new Date().toISOString(),
+    url,
+    title,
+    fetchMode: payload.selectedText ? "chrome-extension-selection" : "chrome-extension-dom",
+    ...parsed,
+    jobDescription: text.slice(0, 16000)
+  };
+  return latestImportedPage;
+}
+
+async function fetchJobFromUrl(jobUrl) {
+  if (!jobUrl || !/^https?:\/\//i.test(jobUrl)) {
+    return { ok: false, error: "Please provide a valid http or https job URL." };
+  }
+
+  try {
+    const response = await fetch(jobUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 AI Job Application Agent",
+        "Accept": "text/html,application/xhtml+xml"
+      }
+    });
+    const html = await response.text();
+    if (!response.ok) {
+      return { ok: false, error: `Could not fetch page: HTTP ${response.status}` };
+    }
+
+    let text = htmlToText(html);
+    let title = extractTitle(html);
+    let fetchMode = "direct-html";
+
+    if (isUnreadableJobText(text)) {
+      const reader = await fetchWithReader(jobUrl);
+      if (reader.ok) {
+        text = reader.text;
+        title = reader.title || title;
+        fetchMode = "jina-reader";
+      }
+    }
+
+    if (isUnreadableJobText(text)) {
+      return {
+        ok: false,
+        error: "The page could not be read cleanly. It may require login, JavaScript rendering, or block automated access."
+      };
+    }
+
+    const parsed = parseJobMetadata(title, text, jobUrl);
+    return {
+      ok: true,
+      url: jobUrl,
+      fetchMode,
+      ...parsed,
+      jobDescription: text.slice(0, 12000)
+    };
+  } catch (error) {
+    return { ok: false, error: `Fetch failed: ${error.message}` };
+  }
+}
+
+function isUnreadableJobText(text) {
+  return !text || text.length < 300 || /sign in|log in|enable javascript|access denied/i.test(text.slice(0, 1200));
+}
+
+async function fetchWithReader(jobUrl) {
+  try {
+    const readerUrl = `https://r.jina.ai/${jobUrl}`;
+    const response = await fetch(readerUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 AI Job Application Agent",
+        "Accept": "text/plain,text/markdown"
+      }
+    });
+    const text = await response.text();
+    if (!response.ok || text.length < 300) return { ok: false };
+    const title = text.match(/^Title:\s*(.+)$/m)?.[1] || "";
+    return { ok: true, text, title };
+  } catch {
+    return { ok: false };
+  }
+}
+
+function htmlToText(html) {
+  return String(html)
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ")
+    .replace(/<\/(p|div|li|h[1-6]|section|article|br)>/gi, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function extractTitle(html) {
+  const title = String(html).match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || "";
+  return htmlToText(title);
+}
+
+function parseJobMetadata(title, text, jobUrl) {
+  const firstLines = text.split("\n").map((line) => line.trim()).filter(Boolean).slice(0, 20);
+  const combined = [title, ...firstLines].join("\n");
+  const atMatch = combined.match(/(.+?)\s+(?:at|@)\s+(.+?)(?:\s+-|\s+\||$)/i);
+  const role = cleanField(atMatch?.[1]) || cleanField(firstLines.find((line) => /engineer|analyst|specialist|coordinator|manager|developer|designer/i.test(line))) || "";
+  const company = cleanField(atMatch?.[2]) || cleanField(firstLines.find((line) => /^[A-Z][A-Za-z0-9 .&-]{2,40}$/.test(line))) || "";
+  const location = text.match(/\b(San Francisco|New York|Boston|Houston|Remote|Redwood City|Los Angeles|California|NYC|Bay Area)[^.\n,]*/i)?.[0] || "";
+  const source = new URL(jobUrl).hostname.replace(/^www\./, "");
+  return { company, role, location, source };
+}
+
+function cleanField(value = "") {
+  return String(value)
+    .replace(/\s+/g, " ")
+    .replace(/\b(Y Combinator|Work at a Startup|Jobs|Careers)\b/gi, "")
+    .replace(/[-|]+$/g, "")
+    .trim();
 }
 
 async function analyzeWithOpenAI(input) {
@@ -116,35 +287,7 @@ async function analyzeWithOpenAI(input) {
         {
           role: "user",
           content: JSON.stringify({
-            candidateProfile: {
-              name: "Zhuo Chen",
-              background: "Computer Engineering / Computer Science graduate",
-              skills: [
-                "Python",
-                "SQL",
-                "Flask",
-                "MySQL",
-                "Docker",
-                "Git",
-                "Postman",
-                "REST APIs",
-                "data validation",
-                "debugging",
-                "database maintenance",
-                "Pandas",
-                "NumPy",
-                "AI workflow automation",
-                "prompt design"
-              ],
-              experience: [
-                "Software development and database maintenance at Xiyin (Shein)",
-                "Data validation, debugging, troubleshooting, and system reliability work",
-                "REST API project using Flask, MySQL, Postman, and Docker",
-                "Search/text processing project using TF-IDF and cosine similarity",
-                "AI job application workflow project"
-              ],
-              workAuthorization: "Post-completion OPT; eligible for STEM OPT extension; needs E-Verify and Form I-983 support."
-            },
+            candidateProfile: input.candidateProfile,
             job: input
           })
         }

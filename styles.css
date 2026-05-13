@@ -96,6 +96,50 @@ textarea {
   line-height: 1.45;
 }
 
+textarea.compact {
+  min-height: 78px;
+}
+
+.topbar,
+.modal-header,
+.url-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.url-row {
+  align-items: center;
+}
+
+.url-row input {
+  flex: 1;
+}
+
+dialog {
+  width: min(880px, calc(100vw - 32px));
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0;
+}
+
+dialog::backdrop {
+  background: rgba(23, 32, 38, 0.45);
+}
+
+.profile-modal {
+  padding: 18px;
+}
+
+.modal-header {
+  margin-bottom: 14px;
+}
+
+.modal-actions {
+  justify-content: flex-end;
+}
+
 .field-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

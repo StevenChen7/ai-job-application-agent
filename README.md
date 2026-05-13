@@ -16,6 +16,8 @@ The app supports two modes:
 ## What It Does
 
 - Parses job descriptions for skills, role type, location, seniority, visa language, and AI/automation keywords
+- Lets users edit a candidate profile with name, headline, skills, experience, and work authorization notes
+- Fetches job pages from a URL when the page allows automated reading
 - Scores candidate fit based on technical and workflow experience
 - Generates tailored resume bullets for the role
 - Generates a founder/recruiter outreach message
@@ -40,6 +42,7 @@ The workflow is relevant to roles such as:
 
 ```text
 Job Description
+Candidate Profile
       |
       v
 Requirement Extractor
@@ -133,6 +136,58 @@ POST /api/analyze
 The local Node server holds the API key and calls the OpenAI Responses API. This keeps the key out of browser JavaScript.
 
 If the key is missing or the API returns an error, the server returns local deterministic analysis as a fallback.
+
+## Candidate Profile
+
+The UI includes an editable candidate profile panel:
+
+- Name
+- Headline
+- Skills
+- Experience / projects
+- Work authorization notes
+
+The default profile is prefilled for Zhuo Chen, but the app can analyze any candidate profile entered by the user.
+
+## Job URL Fetching
+
+The UI includes a `Job URL` field and `Fetch` button.
+
+When a URL is provided, the browser calls:
+
+```text
+POST /api/fetch-job
+```
+
+The local Node server attempts to fetch the job page, convert HTML to readable text, infer company/role/location/source, and populate the form.
+
+If direct HTML fetching fails, the app tries a reader fallback using `https://r.jina.ai/` to convert the URL into LLM-friendly text.
+
+Some job boards require login, client-side JavaScript rendering, or block automated access. In those cases, the app shows an error and the user can still paste the job description manually.
+
+## Chrome Extension Import
+
+For pages that cannot be fetched by URL, use the included Chrome extension:
+
+```text
+chrome-extension/
+  manifest.json
+  popup.html
+  popup.js
+```
+
+Install locally:
+
+1. Open `chrome://extensions`
+2. Turn on Developer mode
+3. Click `Load unpacked`
+4. Select the `chrome-extension` folder
+5. Start the local app server
+6. Open a job page in Chrome
+7. Click the extension and import the current page
+8. Return to the app and click `Use Imported Page`
+
+The extension reads the currently rendered page text from the active tab. If the user selects text first, only the selected text is imported.
 
 ## Future Improvements
 

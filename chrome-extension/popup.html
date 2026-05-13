@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AI Job Agent Importer</title>
+  <style>
+    body {
+      width: 340px;
+      margin: 0;
+      padding: 14px;
+      color: #172026;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 0 0 12px;
+      color: #60717c;
+      line-height: 1.4;
+    }
+
+    label {
+      display: grid;
+      gap: 5px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    input {
+      height: 34px;
+      border: 1px solid #cbd5da;
+      border-radius: 6px;
+      padding: 0 9px;
+      font: inherit;
+    }
+
+    button {
+      width: 100%;
+      min-height: 38px;
+      border: 0;
+      border-radius: 6px;
+      background: #0f766e;
+      color: #ffffff;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+    }
+
+    pre {
+      margin: 12px 0 0;
+      white-space: pre-wrap;
+      color: #26343c;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <h1>Import Job Page</h1>
+  <p>Open a job page, then click import. If you select text first, only the selected text will be sent.</p>
+  <label>
+    Local app URL
+    <input id="appUrl" value="http://127.0.0.1:4194">
+  </label>
+  <button id="importButton">Import Current Page</button>
+  <pre id="status">Ready.</pre>
+  <script src="popup.js"></script>
+</body>
+</html>

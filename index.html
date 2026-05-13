@@ -10,9 +10,23 @@
   <main class="app-shell">
     <section class="input-panel">
       <header>
-        <p class="eyebrow">AI workflow automation</p>
-        <h1>AI Job Application Agent</h1>
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">AI workflow automation</p>
+            <h1>AI Job Application Agent</h1>
+          </div>
+          <button id="profileButton" type="button">Profile</button>
+        </div>
       </header>
+
+      <label>
+        Job URL
+        <div class="url-row">
+          <input id="jobUrl" placeholder="https://www.workatastartup.com/jobs/93020">
+          <button id="fetchJobButton" type="button">Fetch</button>
+          <button id="useImportedButton" type="button">Use Imported Page</button>
+        </div>
+      </label>
 
       <div class="field-grid">
         <label>
@@ -96,6 +110,44 @@
       </div>
     </section>
   </main>
+
+  <dialog id="profileDialog">
+    <form method="dialog" class="profile-modal">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Candidate setup</p>
+          <h2>User Profile</h2>
+        </div>
+        <button id="closeProfileButton" type="button">Close</button>
+      </div>
+      <div class="field-grid">
+        <label>
+          Name
+          <input id="candidateName" autocomplete="name" placeholder="Zhuo Chen">
+        </label>
+        <label>
+          Headline
+          <input id="candidateHeadline" placeholder="Computer Engineering graduate interested in AI automation">
+        </label>
+      </div>
+      <label>
+        Skills
+        <textarea id="candidateSkills" class="compact" placeholder="Python, SQL, Flask, REST APIs, Docker, data validation"></textarea>
+      </label>
+      <label>
+        Experience / Projects
+        <textarea id="candidateExperience" class="compact" placeholder="Software development, database maintenance, AI workflow projects"></textarea>
+      </label>
+      <label>
+        Work Authorization Notes
+        <textarea id="candidateAuthorization" class="compact" placeholder="OPT, STEM OPT, E-Verify, sponsorship notes"></textarea>
+      </label>
+      <div class="actions modal-actions">
+        <button id="resetProfileButton" type="button">Reset</button>
+        <button id="saveProfileButton" type="button" class="primary">Save Profile</button>
+      </div>
+    </form>
+  </dialog>
 
   <script type="module" src="src/app.js"></script>
 </body>

@@ -132,9 +132,10 @@ export function evaluateOptRisk(jobDescription, location = "") {
   return "Need confirm";
 }
 
-export function generateApplicationContent({ company, role, location, source, jobDescription }, profile = DEFAULT_PROFILE) {
+export function generateApplicationContent({ company, role, location, source, jobDescription, candidateProfile }, profile = DEFAULT_PROFILE) {
+  const activeProfile = normalizeProfile(candidateProfile, profile);
   const requirements = extractRequirements(jobDescription);
-  const match = matchCandidate(requirements, profile);
+  const match = matchCandidate(requirements, activeProfile);
   const optRisk = evaluateOptRisk(jobDescription, location);
   const cleanCompany = company || "the company";
   const cleanRole = role || "this role";
@@ -149,7 +150,8 @@ export function generateApplicationContent({ company, role, location, source, jo
     `Role signals: ${requirements.roleSignals.join(", ") || "not enough data"}`,
     `Matched skills: ${match.matched.join(", ") || "none detected"}`,
     `Missing or learning focus: ${match.missing.join(", ") || "none detected"}`,
-    `OPT follow-up: Confirm E-Verify enrollment and Form I-983 support before final acceptance.`
+    `Candidate: ${activeProfile.name || "Candidate"}`,
+    `OPT follow-up: ${activeProfile.workAuthorizationNote || "Confirm work authorization requirements before final acceptance."}`
   ].join("\n");
 
   const bullets = [
@@ -162,7 +164,7 @@ export function generateApplicationContent({ company, role, location, source, jo
   const message = [
     `Hi ${cleanCompany} team,`,
     "",
-    `I am Zhuo, a Computer Engineering / Computer Science graduate with experience in software development, database maintenance, data validation, debugging, REST APIs, Python, SQL, Flask, MySQL, Docker, and Postman.`,
+    `I am ${activeProfile.name || "a candidate"}, ${activeProfile.headline || "with experience in software, data workflows, and AI automation."}`,
     "",
     `${cleanCompany} interests me because the ${cleanRole} role connects practical software work with real business workflows. I am especially interested in roles where I can work close to users, understand operational problems, build or support technical systems, and help make AI-enabled workflows more reliable.`,
     "",
@@ -196,3 +198,14 @@ export function generateApplicationContent({ company, role, location, source, jo
 }
 
 export { DEFAULT_PROFILE };
+
+function normalizeProfile(candidateProfile, fallback) {
+  if (!candidateProfile) return fallback;
+  return {
+    name: candidateProfile.name || fallback.name,
+    headline: candidateProfile.headline || fallback.headline,
+    skills: Array.isArray(candidateProfile.skills) && candidateProfile.skills.length ? candidateProfile.skills : fallback.skills,
+    experience: Array.isArray(candidateProfile.experience) && candidateProfile.experience.length ? candidateProfile.experience : fallback.experience,
+    workAuthorizationNote: candidateProfile.workAuthorizationNote || fallback.workAuthorizationNote
+  };
+}
