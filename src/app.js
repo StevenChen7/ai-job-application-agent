@@ -38,16 +38,34 @@ function writeInput(data) {
   });
 }
 
-function analyze() {
+async function analyze() {
   const input = readInput();
-  const result = generateApplicationContent(input);
+  const result = await analyzeWithApi(input);
   outputs.fitScore.textContent = `${result.match.score}% ${result.match.fitLevel}`;
-  outputs.roleType.textContent = result.requirements.roleSignals[0] || "General";
+  outputs.roleType.textContent = result.mode === "openai" ? "OpenAI" : (result.requirements.roleSignals[0] || "General");
   outputs.riskLevel.textContent = result.optRisk;
-  outputs.summaryOutput.textContent = result.summary;
+  outputs.summaryOutput.textContent = result.warning ? `${result.warning}\n\n${result.summary}` : result.summary;
   outputs.bulletsOutput.textContent = result.bullets;
   outputs.messageOutput.textContent = result.message;
   outputs.trackerOutput.textContent = result.trackerRow;
+}
+
+async function analyzeWithApi(input) {
+  try {
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input)
+    });
+    if (!response.ok) throw new Error(`API returned ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    return {
+      mode: "browser-fallback",
+      warning: `Local API unavailable: ${error.message}. Using browser fallback.`,
+      ...generateApplicationContent(input)
+    };
+  }
 }
 
 function clearAll() {

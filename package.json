@@ -4,6 +4,7 @@
   "description": "A browser-based AI workflow automation project for job description analysis, resume tailoring, outreach drafting, and application tracking.",
   "type": "module",
   "scripts": {
+    "start": "node dev-server.mjs",
     "test": "node tests/run-tests.mjs"
   },
   "keywords": [

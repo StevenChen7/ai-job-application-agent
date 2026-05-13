@@ -6,7 +6,12 @@ This project is designed as a practical AI agent workflow rather than a model-tr
 
 ## Demo
 
-Open `index.html` in a browser. No backend or paid API key is required for the MVP.
+Run the local server and open the app in a browser.
+
+The app supports two modes:
+
+- OpenAI mode: calls the OpenAI Responses API through a local Node server
+- Local fallback mode: uses deterministic matching if no API key is configured
 
 ## What It Does
 
@@ -74,23 +79,60 @@ ai-job-application-agent/
 
 ## How To Run
 
-Option 1: Open directly
-
-```text
-index.html
-```
-
-Option 2: Run a local static server
+Install/run requirements:
 
 ```bash
-npx serve .
+node --version
+npm test
 ```
 
-Option 3: Run tests
+Start without an API key:
+
+```bash
+npm start
+```
+
+Then open:
+
+```text
+http://127.0.0.1:4173
+```
+
+Start with OpenAI API:
+
+PowerShell:
+
+```powershell
+$env:OPENAI_API_KEY="sk-your-api-key"
+$env:OPENAI_MODEL="gpt-4.1-mini"
+npm start
+```
+
+macOS/Linux:
+
+```bash
+export OPENAI_API_KEY="sk-your-api-key"
+export OPENAI_MODEL="gpt-4.1-mini"
+npm start
+```
+
+Run tests:
 
 ```bash
 node tests/run-tests.mjs
 ```
+
+## API Design
+
+The browser calls:
+
+```text
+POST /api/analyze
+```
+
+The local Node server holds the API key and calls the OpenAI Responses API. This keeps the key out of browser JavaScript.
+
+If the key is missing or the API returns an error, the server returns local deterministic analysis as a fallback.
 
 ## Future Improvements
 
